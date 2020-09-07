@@ -21,12 +21,66 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="library.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime\utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\clipboard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\keylog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\process_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\remote_dll_injection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\startup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\uac_bypass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\get_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\clipboard.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\keylog_hook.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\keylog_rawinput.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\process_list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\remote_dll_injection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\startup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\uac_bypass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime\utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\get_system.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
