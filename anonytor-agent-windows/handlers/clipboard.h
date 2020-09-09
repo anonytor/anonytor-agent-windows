@@ -1,3 +1,4 @@
 #pragma once
 
-wchar_t* GetClipboardText();
+WCHAR* GetClipboardText();
+const WCHAR* GetClipboardTextHelper();

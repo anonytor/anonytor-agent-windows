@@ -2,64 +2,71 @@
 
 #include "runtime/utils.h"
 
-//find the address of LoadLibrary (it's the same accross all processes)
-static void* getLoadLibraryAddr()
+//找到 LoadLibrary 函数地址 (所有进程中都一样)
+static void* LoadLibraryAddr = NULL;
+static void* GetLoadLibraryAddr()
 {
-	HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
-	if (hKernel32 == NULL)
+	if (LoadLibraryAddr == NULL)
 	{
-		ErrorExit(TEXT("GetModuleHandle"));
+		HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
+		if (hKernel32 == NULL)
+		{
+			puts("### Unexpected Error in GetLoadLibraryAddr ###");
+			ErrorExit(TEXT("GetModuleHandle"));
+		}
+		LPVOID llBaseAddress = (LPVOID)GetProcAddress(hKernel32, "LoadLibraryW");
+		if (llBaseAddress == NULL)
+		{
+			puts("### Unexpected Error in GetLoadLibraryAddr ###");
+			ErrorExit(TEXT("GetProcAddress"));
+		}
+		printf("GetLoadLibraryAddr: LoadLibrary base address is: 0x%p\n", llBaseAddress);
+
+		LoadLibraryAddr = llBaseAddress;
 	}
-	LPVOID llBaseAddress = (LPVOID)GetProcAddress(hKernel32, "LoadLibraryW");
-	if (llBaseAddress == NULL)
-	{
-		ErrorExit(TEXT("GetProcAddress"));
-	}
-	printf("[+] LoadLibrary base address is: 0x%p\n", llBaseAddress);
-	return llBaseAddress;
+	return LoadLibraryAddr;
 }
 
-bool injectDll(DWORD pid, LPCWSTR dll_path)
+BOOL InjectDll(DWORD pid, LPCWSTR dll_path)
 {
 	HANDLE hProcess = OpenProcess(PROCESS_DUP_HANDLE | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (hProcess == NULL)
 	{
-		//printf("[-] Couldn't open process, exiting...\n");
-		//return -1;
-		ErrorExit(TEXT("OpenProcess"));
+		printf("InjectDll: Couldn't open process.\n");
+		return FALSE;
 	}
-	printf("[+] Process handle: 0x%p\n", hProcess);
+	printf("InjectDll: Process handle: 0x%p\n", hProcess);
 	
 	//allocate memory in target process
 	LPVOID lpBaseAddress = (LPVOID)VirtualAllocEx(hProcess, NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 	if (lpBaseAddress == NULL)
 	{
-		ErrorExit(TEXT("VirtualAllocEx"));
+		printf("InjectDll: VirtualAllocEx failed.\n");
+		return FALSE;
 	}
-	printf("[+] Allocated memory address in target process is: 0x%p\n", lpBaseAddress);
+	//printf("InjectDll: Allocated memory address in target process is: 0x%p\n", lpBaseAddress);
 
 	//write DLL name to target process
 	SIZE_T* lpNumberOfBytesWritten = 0;
 	BOOL resWPM = WriteProcessMemory(hProcess, lpBaseAddress, dll_path, wcslen(dll_path) * 2 + 1, lpNumberOfBytesWritten);
 	if (!resWPM)
 	{
-		ErrorExit(TEXT("WriteProcessMemory"));
+		printf("InjectDll: WriteProcessMemory failed.\n");
+		return FALSE;
 	}
-	printf("[+] DLL name is written to memory of target process\n");
+	//printf("[+] DLL name is written to memory of target process\n");
 
 
 	//start remote thread in target process
 	HANDLE hThread = NULL;
 	DWORD ThreadId = 0;
-	hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)getLoadLibraryAddr(), lpBaseAddress, 0, (LPDWORD)(&ThreadId));
+	hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetLoadLibraryAddr(), lpBaseAddress, 0, (LPDWORD)(&ThreadId));
 	if (hThread == NULL)
 	{
-		ErrorExit(TEXT("CreateRemoteThread"));
+		printf("InjectDll: CreateRemoteThread failed.\n");
+		return FALSE;
 	}
-	printf("[+] Successfully started DLL in target process\n");
-	if (ThreadId != 0)
-	{
-		printf("[+] Injected thread id: %ul for pid: %ul\n", ThreadId, pid);
-	}
-	return true;
+	//printf("[+] Successfully started DLL in target process\n");
+	printf("InjectDll: Injected thread id: %lu for pid: %lu\n", ThreadId, pid);
+	return TRUE;
 }

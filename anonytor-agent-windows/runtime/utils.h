@@ -1,6 +1,5 @@
 #pragma once
 
-
 void ConsoleInit();
 void ShowError();
 void ShowError(DWORD err);

@@ -9,23 +9,21 @@
 
 #include "process_list.h"
 
-EXE* creatList() //创建链表
+MY_PROC* CreatProcList() //创建链表
 {
-	//std::wcout << L"cout hello!还好" << std::endl;
-	//wprintf(L"aaa调用失败！ggg\n");
-	EXE* head = NULL, * now = NULL, * last = NULL;
+	MY_PROC* head = NULL, * now = NULL, * last = NULL;
 	PROCESSENTRY32 pe32;			//创建进程快照的结构体 
 	pe32.dwSize = sizeof(PROCESSENTRY32);		//设置大小 
 	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);		//获取系统中所有的进程快照 
 	if (hProcessSnap == INVALID_HANDLE_VALUE)			//调用函数失败返回 INVALID_HANDLE_VALUE
 	{
-		printf("failed\n");
+		printf("CreatProcList: CreateToolhelp32Snapshot failed\n");
 		return 0;
 	}
 	BOOL bmore = Process32First(hProcessSnap, &pe32);	//调用成功 获取第一个进程信息 获取成功则进入循环 
 	while (bmore)
 	{
-		now = (EXE*)malloc(sizeof(struct exe));				//为当前的指针分配空间 
+		now = (MY_PROC*)malloc(sizeof(struct my_proc));				//为当前的指针分配空间 
 		now->ID = pe32.th32ProcessID;			//将进程ID赋值到节点中 
 		wcsncpy(now->name, pe32.szExeFile, wcslen(pe32.szExeFile)+1);		//将进程名赋值到节点中 
 
@@ -46,9 +44,9 @@ EXE* creatList() //创建链表
 	return head;
 }
 
-void printList(EXE* list)//创建打印列表的函数 
+void PrintProcList(MY_PROC* list)//创建打印列表的函数 
 {
-	EXE* head = list;
+	MY_PROC* head = list;
 	while (list != NULL)
 	{
 		printf("ID:%-16u", list->ID);
@@ -59,21 +57,15 @@ void printList(EXE* list)//创建打印列表的函数
 	printf("\n");
 }
 
-void readFile(char * path)
+void DestroyProcList(MY_PROC* list)
 {
-	//path = "C:\\Users\\Miracle\\Desktop\\V.txt";
-	//FILE* fp = fopen(path, "wb+");
-	FILE* fp = fopen("C:\\Users\\Miracle\\Desktop\\V.txt", "wb+");
-
-	printf("%s\n", path);
-	printf("success");
-	fclose(fp);
+	MY_PROC* prev = list;
+	list = list->next;
+	for (;list;)
+	{
+		free(prev);
+		prev = list;
+		list = list->next;
+	}
+	free(prev);
 }
-char* GetFilename(char* p) //得到一个路径的纯文件名
-{
-	int x = strlen(p);
-	char ch = '\\';
-	char* q = strrchr(p, ch);
-	return q;
-}
-

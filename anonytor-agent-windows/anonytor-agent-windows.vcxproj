@@ -169,7 +169,7 @@
     <ClInclude Include="handlers\startup.h" />
     <ClInclude Include="handlers\taskmgr_hook.h" />
     <ClInclude Include="handlers\uac_bypass.h" />
-    <ClInclude Include="library.h" />
+    <ClInclude Include="export.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="runtime\utils.h" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <tlhelp32.h>
 
-
+// 不区分大小写，获取进程PID
 DWORD GetPIDByName(LPCWSTR name)
 {
 	DWORD pid = NULL;
@@ -15,7 +15,7 @@ DWORD GetPIDByName(LPCWSTR name)
 
 	Process32First(hSnapshot, &pe);
 	do {
-		if (lstrcmp(name, pe.szExeFile) == 0) {
+		if (_wcsicmp(name, pe.szExeFile) == 0) {
 			pid = pe.th32ProcessID;
 			//if (Thread32First(hSnapshot, &te)) {
 			//	do {
@@ -60,61 +60,40 @@ void ConsoleInit()
 	}
 }
 
+void ShowError(DWORD err)
+{
+	// 翻译 ErrorCode
+	LPSTR Error = NULL;
+	if (::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		err,
+		0,
+		(LPSTR)&Error,
+		0,
+		NULL) == 0)
+	{
+		printf("FormatMessageA failed. Error code: %lu", err);
+		return;
+	}
+
+	// Display message.
+	//MessageBoxA(NULL, Error, L"Error", MB_OK | MB_ICONWARNING);
+	printf("LastError is %s", Error);
+
+	// Free the buffer.
+	if (Error)
+	{
+		::LocalFree(Error);
+		Error = 0;
+	}
+}
+
 void ShowError()
 {
 	// Get last error.
 	DWORD err = GetLastError();
-
-	// Translate ErrorCode to String.
-	LPTSTR Error = 0;
-	if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		err,
-		0,
-		(LPTSTR)&Error,
-		0,
-		NULL) == 0)
-	{
-		// Failed in translating.
-	}
-
-	// Display message.
-	MessageBox(NULL, Error, L"Error", MB_OK | MB_ICONWARNING);
-
-	// Free the buffer.
-	if (Error)
-	{
-		::LocalFree(Error);
-		Error = 0;
-	}
+	ShowError(err);
 }
-
-void ShowError(DWORD err)
-{
-	// Translate ErrorCode to String.
-	LPTSTR Error = 0;
-	if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		err,
-		0,
-		(LPTSTR)&Error,
-		0,
-		NULL) == 0)
-	{
-		// Failed in translating.
-	}
-
-	// Display message.
-	MessageBox(NULL, Error, L"Error", MB_OK | MB_ICONWARNING);
-
-	// Free the buffer.
-	if (Error)
-	{
-		::LocalFree(Error);
-		Error = 0;
-	}
-}
-
 
 void ErrorExit(const wchar_t* message)
 {

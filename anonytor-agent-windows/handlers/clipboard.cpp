@@ -4,16 +4,17 @@
 
 // 全局变量:
 
-wchar_t* GetClipboardText()
+WCHAR* GetClipboardText()
 {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
 	{
-		puts("clipboard not text!!");
+		puts("Not text in clipboard !");
 		return NULL;
 	}
 	// Try opening the clipboard
 	if (!OpenClipboard(nullptr))
 	{
+		puts("GetClipboardText: OpenClipboard failed !");
 		ShowError();
 	}
 
@@ -21,13 +22,15 @@ wchar_t* GetClipboardText()
 	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
 	if (hData == nullptr) 
 	{
+		puts("GetClipboardText: GetClipboardData failed !");
 		ShowError();
 	}
 
 	// Lock the handle to get the actual text pointer
-	wchar_t* pszText = static_cast<wchar_t*>(GlobalLock(hData));
+	WCHAR* pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr)
 	{
+		puts("GetClipboardText: GlobalLock failed !");
 		ShowError();
 		return NULL;
 	}
@@ -39,4 +42,14 @@ wchar_t* GetClipboardText()
 	CloseClipboard();
 
 	return pszText;
+}
+
+const WCHAR* GetClipboardTextHelper()
+{
+	WCHAR* tmp = GetClipboardText();
+	if (tmp == NULL)
+	{
+		return L"";
+	}
+	return tmp;
 }

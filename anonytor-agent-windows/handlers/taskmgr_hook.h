@@ -1,4 +1,11 @@
 #pragma once
 
 extern LPCWSTR HookName;
-void StartHook();
+void SetHook();
+extern HANDLE ScanningThread;
+BOOL StartScanningThread();
+BOOL StopScanningThread();
+void InjectDebounce();
+void ScanAndInject();
+
+

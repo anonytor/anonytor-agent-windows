@@ -92,6 +92,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
         rid.hwndTarget = hWnd;
         if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == FALSE)
         {
+            puts("RawInputKeyLogger: RegisterRawInputDevices Failed !");
             ShowError();
         }
         return DefWindowProc(hWnd, message, wParam, lParam);

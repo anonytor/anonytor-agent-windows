@@ -1,3 +1,4 @@
 #pragma once
 
-void setStratupReg();
+BOOL SetStratupReg();
+BOOL DeleteStratupReg();

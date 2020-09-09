@@ -1,3 +1,3 @@
 #pragma once
 
-bool injectDll(DWORD pid, LPCWSTR dll_path);
+BOOL InjectDll(DWORD pid, LPCWSTR dll_path);
