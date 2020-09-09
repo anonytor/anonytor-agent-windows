@@ -1,5 +1,53 @@
 #include "pch.h"
+#include <tlhelp32.h>
 
+
+DWORD GetPIDByName(LPCWSTR name)
+{
+	DWORD pid = NULL;
+	HANDLE hSnapshot = INVALID_HANDLE_VALUE;
+	PROCESSENTRY32 pe;
+	THREADENTRY32 te;
+
+	pe.dwSize = sizeof(pe);
+	te.dwSize = sizeof(te);
+	hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
+
+	Process32First(hSnapshot, &pe);
+	do {
+		if (lstrcmp(name, pe.szExeFile) == 0) {
+			pid = pe.th32ProcessID;
+			//if (Thread32First(hSnapshot, &te)) {
+			//	do {
+			//		if (te.th32OwnerProcessID == pid) {
+			//			tids.push_back(te.th32ThreadID);
+			//		}
+			//	} while (Thread32Next(hSnapshot, &te));
+			//}
+			break;
+		}
+
+	} while (Process32Next(hSnapshot, &pe));
+	CloseHandle(hSnapshot);
+
+	return pid;
+
+}
+
+
+LPWSTR lstrcat_heap(LPCWSTR str1, LPCWSTR str2)
+{
+	size_t len1 = (size_t)lstrlen(str1) * 2;
+	size_t len2 = (size_t)lstrlen(str2) * 2;
+	LPWSTR dest = (LPWSTR)malloc(len1 + len2 + 2);
+	if (dest == NULL)
+	{
+		return NULL;
+	}
+	lstrcpy(dest, str1);
+	lstrcat(dest, str2);
+	return dest;
+}
 
 void ConsoleInit()
 {

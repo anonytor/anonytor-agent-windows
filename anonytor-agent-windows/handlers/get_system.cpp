@@ -1,9 +1,9 @@
 #include "pch.h"
 
 #include <Lmcons.h>
-#include <tlhelp32.h>
 
 #include "runtime/utils.h"
+#include "dllmain.h"
 
 extern HINSTANCE hInst;
 
@@ -67,7 +67,7 @@ std::string get_username()
 }
 
 // 第二个参数为NULL的时候, 第三个参数中指定可执行文件路径
-bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
+bool ElevateExecute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 {
 	// Print whoami to compare to thread later
 	printf("[+] Current user is: %s\n", (get_username()).c_str());
@@ -80,6 +80,7 @@ bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
 	ZeroMemory(&processInformation, sizeof(PROCESS_INFORMATION));
 	startupInfo.cb = sizeof(STARTUPINFO);
+	BOOL ret = TRUE;
 
 	// Add SE debug privilege
 	HANDLE currentTokenHandle = NULL;
@@ -99,6 +100,7 @@ bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	{
 		printf("[-] OpenProcess() Return Code: %i\n", processHandle);
 		printf("[-] OpenProcess() Error: %i\n", GetLastError());
+		ret = FALSE;
 	}
 
 	// Call OpenProcessToken(), print return code and error code
@@ -109,21 +111,7 @@ bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	{
 		printf("[-] OpenProcessToken() Return Code: %i\n", getToken);
 		printf("[-] OpenProcessToken() Error: %i\n", GetLastError());
-	}
-
-	// Impersonate user in a thread
-	BOOL impersonateUser = ImpersonateLoggedOnUser(tokenHandle);
-	if (GetLastError() == NULL)
-	{
-		printf("[+] ImpersonatedLoggedOnUser() success!\n");
-		printf("[+] Current user is: %s\n", (get_username()).c_str());
-		printf("[+] Reverting thread to original user context\n");
-		RevertToSelf();
-	}
-	else
-	{
-		printf("[-] ImpersonatedLoggedOnUser() Return Code: %i\n", getToken);
-		printf("[-] ImpersonatedLoggedOnUser() Error: %i\n", GetLastError());
+		ret =  FALSE;
 	}
 
 	// Call DuplicateTokenEx(), print return code and error code
@@ -134,6 +122,7 @@ bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	{
 		printf("[-] DuplicateTokenEx() Return Code: %i\n", duplicateToken);
 		printf("[-] DupicateTokenEx() Error: %i\n", GetLastError());
+		ret = FALSE;
 	}
 
 	// Call CreateProcessWithTokenW(), print return code and error code
@@ -144,56 +133,103 @@ bool elevate_execute(DWORD pid, LPCWSTR executable_path, LPWSTR command_line)
 	{
 		printf("[-] CreateProcessWithTokenW Return Code: %i\n", createProcess);
 		printf("[-] CreateProcessWithTokenW Error: %i\n", GetLastError());
+		ret = FALSE;
 	}
 
-	return 0;
+	return ret;
 }
 
-DWORD getPidByName(LPCWSTR name) {
-	DWORD pid = NULL;
-	HANDLE hSnapshot = INVALID_HANDLE_VALUE;
-	PROCESSENTRY32 pe;
-	THREADENTRY32 te;
-
-	pe.dwSize = sizeof(pe);
-	te.dwSize = sizeof(te);
-	hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
-
-	Process32First(hSnapshot, &pe);
-	do {
-		if (lstrcmp(name, pe.szExeFile) == 0) {
-			pid = pe.th32ProcessID;
-			//if (Thread32First(hSnapshot, &te)) {
-			//	do {
-			//		if (te.th32OwnerProcessID == pid) {
-			//			tids.push_back(te.th32ThreadID);
-			//		}
-			//	} while (Thread32Next(hSnapshot, &te));
-			//}
-			break;
-		}
-
-	} while (Process32Next(hSnapshot, &pe));
-	CloseHandle(hSnapshot);
-
-	return pid;
-
-}
-
-bool get_system()
+bool ElevateSelf(DWORD pid)
 {
-	DWORD pid = getPidByName(L"winlogon.exe");
+	// Print whoami to compare to thread later
+	printf("[+] Current user is: %s\n", (get_username()).c_str());
+
+	// Initialize variables and structures
+	HANDLE tokenHandle = NULL;
+	HANDLE duplicateTokenHandle = NULL;
+	STARTUPINFO startupInfo;
+	PROCESS_INFORMATION processInformation;
+	ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
+	ZeroMemory(&processInformation, sizeof(PROCESS_INFORMATION));
+	startupInfo.cb = sizeof(STARTUPINFO);
+	BOOL ret = TRUE;
+
+	// Add SE debug privilege
+	HANDLE currentTokenHandle = NULL;
+	BOOL getCurrentToken = OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &currentTokenHandle);
+	if (SetPrivilege(currentTokenHandle, L"SeDebugPrivilege", TRUE))
+	{
+		printf("[+] SeDebugPrivilege enabled!\n");
+	}
+
+	// Call OpenProcess(), print return code and error code
+	HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
+	//HANDLE processHandle = OpenProcess(PROCESS_DUP_HANDLE | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+
+	if (GetLastError() == NULL)
+		printf("[+] OpenProcess() success!\n");
+	else
+	{
+		printf("[-] OpenProcess() Return Code: %i\n", processHandle);
+		printf("[-] OpenProcess() Error: %i\n", GetLastError());
+		ret = FALSE;
+	}
+
+	// Call OpenProcessToken(), print return code and error code
+	BOOL getToken = OpenProcessToken(processHandle, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &tokenHandle);
+	if (GetLastError() == NULL)
+		printf("[+] OpenProcessToken() success!\n");
+	else
+	{
+		printf("[-] OpenProcessToken() Return Code: %i\n", getToken);
+		printf("[-] OpenProcessToken() Error: %i\n", GetLastError());
+		ret = FALSE;
+	}
+
+	// Impersonate user in a thread
+	BOOL impersonateUser = ImpersonateLoggedOnUser(tokenHandle);
+	if (GetLastError() == NULL)
+	{
+		printf("[+] ImpersonatedLoggedOnUser() success!\n");
+		printf("[+] Current user is: %s\n", (get_username()).c_str());
+	}
+	else
+	{
+		printf("[-] ImpersonatedLoggedOnUser() Return Code: %i\n", getToken);
+		printf("[-] ImpersonatedLoggedOnUser() Error: %i\n", GetLastError());
+		ret = FALSE;
+	}
+	return ret;
+}
+
+bool ElevateSelf()
+{
+	DWORD pid = GetPIDByName(L"winlogon.exe");
+	
+	return ElevateSelf(pid);
+}
+
+bool ElevateExecute(LPCWSTR executable_path, LPWSTR command_line)
+{
+	DWORD pid = GetPIDByName(L"winlogon.exe");
 	if (pid == NULL)
 	{
-		ErrorExit(L"get_system: Unable to get pid of winlogon.exe.");
+		puts("elevate_execute: Unable to get pid of winlogon.exe.");
+		return FALSE;
 	}
-	wchar_t module_path[MAX_PATH + 12];
-	GetModuleFileName(hInst, module_path, MAX_PATH);
-	lstrcat(module_path, L",EntryPoint");
-	wchar_t command_line[MAX_PATH + 100];
-	lstrcpy(command_line, L"C:\\Windows\\System32\\rundll32.exe ");
-	lstrcat(command_line, module_path);
-	std::wcout << command_line << std::endl;
-	elevate_execute(pid, NULL, command_line);
-	return true;
+	return ElevateExecute(pid, executable_path, command_line);
+}
+
+BOOL GetSystem(LPCWSTR self_cmd)
+{
+	DWORD pid = GetPIDByName(L"winlogon.exe");
+	if (pid == NULL)
+	{
+		puts("get_system: Unable to get pid of winlogon.exe.");
+		return FALSE;
+	}
+	LPWSTR command_line2 = lstrcat_heap(commandline, self_cmd);
+	std::wcout << command_line2 << std::endl;
+	
+	return ElevateExecute(pid, NULL, command_line2);
 }

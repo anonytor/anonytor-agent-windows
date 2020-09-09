@@ -156,6 +156,9 @@
   <ItemGroup>
     <ResourceCompile Include="Payload.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\x64\Release\anonytor-agent-windows.dll" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

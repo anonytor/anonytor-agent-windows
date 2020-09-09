@@ -48,6 +48,12 @@
     <ClInclude Include="handlers\get_system.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="dllmain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handlers\taskmgr_hook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -81,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="handlers\get_system.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\taskmgr_hook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

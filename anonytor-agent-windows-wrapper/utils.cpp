@@ -1,5 +1,18 @@
 #include "framework.h"
 
+LPWSTR lstrcat_heap(LPCWSTR str1, LPCWSTR str2)
+{
+	size_t len1 = (size_t)lstrlen(str1) * 2;
+	size_t len2 = (size_t)lstrlen(str2) * 2;
+	LPWSTR dest = (LPWSTR) malloc(len1 + len2 + 1);
+	if (dest == NULL)
+	{
+		return NULL;
+	}
+	lstrcpy(dest, str1);
+	lstrcat(dest, str2);
+	return dest;
+}
 
 void ConsoleInit()
 {

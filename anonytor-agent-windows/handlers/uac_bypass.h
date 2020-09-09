@@ -17,10 +17,10 @@ typedef interface ICMLuaUtil ICMLuaUtil;
 typedef struct ICMLuaUtilVtbl {
 	BEGIN_INTERFACE
 
-		HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-			__RPC__in ICMLuaUtil* This,
-			__RPC__in REFIID riid,
-			_COM_Outptr_  void** ppvObject);
+	HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+		__RPC__in ICMLuaUtil* This,
+		__RPC__in REFIID riid,
+		_COM_Outptr_  void** ppvObject);
 
 	ULONG(STDMETHODCALLTYPE* AddRef)(
 		__RPC__in ICMLuaUtil* This);
@@ -106,8 +106,8 @@ interface ICMLuaUtil
 	CONST_VTBL struct ICMLuaUtilVtbl* lpVtbl;
 };
 
-BOOL CMLuaUtilBypassUAC(LPCWSTR lpwszExecutable, LPCWSTR parameter);
+BOOL BypassUAC(LPCWSTR lpwszExecutable, LPCWSTR parameter);
 
-void bypassUAC();
+BOOL BypassUAC(LPCWSTR self_cmd);
 
 #endif
