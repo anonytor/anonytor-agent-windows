@@ -6,3 +6,4 @@ extern WCHAR module_path[MAX_PATH + 1];
 extern BOOL stand_alone;
 extern HINSTANCE hModule;
 extern WCHAR* commandline;
+DWORD WINAPI EntryThreadFunc(LPVOID lpParam);

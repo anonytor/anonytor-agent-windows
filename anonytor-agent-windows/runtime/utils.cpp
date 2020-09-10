@@ -1,5 +1,62 @@
 #include "pch.h"
 #include <tlhelp32.h>
+#include <versionhelpers.h>
+#include <Securitybaseapi.h >
+
+int GetIntegrity()
+{
+	HANDLE hProcess = GetCurrentProcess();
+	HANDLE hToken;
+	DWORD dwLengthNeeded;
+	DWORD dwError = ERROR_SUCCESS;
+	PTOKEN_MANDATORY_LABEL pTIL = NULL;
+	if (!OpenProcessToken(hProcess, TOKEN_QUERY | TOKEN_QUERY_SOURCE, &hToken))
+	{
+		return -1;
+	}
+	if (GetTokenInformation(hToken, TokenIntegrityLevel,
+		NULL, 0, &dwLengthNeeded))
+	{
+		return -1;
+	}
+	dwError = GetLastError();
+	if (dwError != ERROR_INSUFFICIENT_BUFFER)
+	{
+		return -1;
+	}
+	pTIL = (PTOKEN_MANDATORY_LABEL)LocalAlloc(0,
+		dwLengthNeeded);
+	if (pTIL == NULL)
+	{
+		return -1;
+	}
+
+	if (GetTokenInformation(hToken, TokenIntegrityLevel,
+		pTIL, dwLengthNeeded, &dwLengthNeeded))
+	{
+		DWORD dwIntegrityLevel = *GetSidSubAuthority(pTIL->Label.Sid,
+			(DWORD)(UCHAR)(*GetSidSubAuthorityCount(pTIL->Label.Sid) - 1));
+
+		if (dwIntegrityLevel >= SECURITY_MANDATORY_SYSTEM_RID)
+		{
+			return 4;
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_HIGH_RID)
+		{
+			return 3;
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_MEDIUM_RID)
+		{
+			return 2;
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_LOW_RID)
+		{
+			return 1;
+		}
+		return 0;
+	}
+	return -1;
+}
 
 // 不区分大小写，获取进程PID
 DWORD GetPIDByName(LPCWSTR name)
@@ -34,6 +91,34 @@ DWORD GetPIDByName(LPCWSTR name)
 
 }
 
+LPCSTR GetSysVersion()
+{
+	if (IsWindowsServer())
+	{
+		return "Windows Server";
+	}
+	else if (IsWindows10OrGreater())
+	{
+		return "Windows 10";
+	}
+	else if (IsWindows8OrGreater())
+	{
+		return "Windows 8";
+	}
+	else if (IsWindows7OrGreater())
+	{
+		return "Windows 7";
+	}
+	else if (IsWindowsVistaOrGreater())
+	{
+		return "Windows vista";
+	}
+	else if (IsWindowsXPOrGreater())
+	{
+		return "Windows XP";
+	}
+	return "Unknown";
+}
 
 LPWSTR lstrcat_heap(LPCWSTR str1, LPCWSTR str2)
 {
