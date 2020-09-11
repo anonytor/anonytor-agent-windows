@@ -57,9 +57,6 @@
     <ClInclude Include="handlers\screenshot.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\cppbase64\base64.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\nlohmann\json.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -333,40 +330,25 @@
     <ClInclude Include="include\spdlog\version.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="controller\connection\BaseConnection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\connection\Connection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\connection\ControlConnection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\connection\TransferConnection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Errors.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Handshake.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Notice.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Request.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Response.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\definition\Slice.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="controller\task\BaseTask.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\get_clipboard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\task.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connection\client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connection\request.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connection\response.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -410,31 +392,10 @@
     <ClCompile Include="handlers\screenshot.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="include\cppbase64\base64.cpp">
+    <ClCompile Include="tasks\get_clipboard.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="controller\connection\BaseConnection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\connection\ControlConnection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\connection\TransferConnection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\definition\Handshake.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\definition\Request.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\definition\Response.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\definition\Slice.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\task\BaseTask.cpp">
+    <ClCompile Include="connection\client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

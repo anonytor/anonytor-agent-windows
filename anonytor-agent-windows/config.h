@@ -8,11 +8,11 @@
 #include <string>
 
 using namespace std;
-namespace Config {
-    const char ServerAddr[] = "10.122.255.161";
-    const int Port = 8888;
-    const string HostID = "testHostID";
-    const string HostKey = "testKey";
+namespace config {
+    const string host = "127.0.0.1";
+    const int port = 8888;
+    const string id = "9e94e0c0-59c6-48ef-9094-3f511bb67e1f";
+    const string key = "=0cf&YOZW&Jx_fYJXKsG6u$mY%9yYV~(";
 
 }
 #endif //CSOCK_CONFIG_H
