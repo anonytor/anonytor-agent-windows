@@ -57,6 +57,318 @@
     <ClInclude Include="handlers\screenshot.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\cppbase64\base64.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nlohmann\json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async_logger-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async_logger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\argv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\env.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\helpers-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\helpers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\log_levels.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\common-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\backtracer-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\backtracer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\circular_q.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\console_globals.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\file_helper-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\file_helper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\fmt_helper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg_buffer-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg_buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\mpmc_blocking_q.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\null_mutex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\os-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\os.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\periodic_worker-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\periodic_worker.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\registry-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\registry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\synchronous_factory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\tcp_client-windows.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\tcp_client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\thread_pool-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\thread_pool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\windows_include.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bin_to_hex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\chrono.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\color.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\compile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\core.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\format-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\format.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\locale.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\os.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\ostream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\posix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\printf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\ranges.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\chrono.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\fmt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\ostr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\formatter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fwd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\logger-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\logger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\pattern_formatter-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\pattern_formatter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\android_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ansicolor_sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ansicolor_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\base_sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\base_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\basic_file_sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\basic_file_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\daily_file_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\dist_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\dup_filter_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\msvc_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\null_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ostream_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ringbuffer_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\rotating_file_sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\rotating_file_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_color_sinks-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_color_sinks.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_sinks-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_sinks.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\syslog_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\systemd_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\tcp_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\wincolor_sink-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\wincolor_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\win_eventlog_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\spdlog-inl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\spdlog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\stopwatch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\tweakme.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\version.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\connection\BaseConnection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\connection\Connection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\connection\ControlConnection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\connection\TransferConnection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Errors.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Handshake.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Notice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Request.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Response.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\definition\Slice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\task\BaseTask.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -96,6 +408,33 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="handlers\screenshot.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="include\cppbase64\base64.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\connection\BaseConnection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\connection\ControlConnection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\connection\TransferConnection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\definition\Handshake.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\definition\Request.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\definition\Response.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\definition\Slice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\task\BaseTask.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
