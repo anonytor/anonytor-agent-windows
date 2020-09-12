@@ -16,6 +16,7 @@ enum cmd_type {
     KeyboardInputRecordUpload,
     TestUpload,
     GetClipboard,
+    GetScreenshot,
     OK,
     Reset
 };

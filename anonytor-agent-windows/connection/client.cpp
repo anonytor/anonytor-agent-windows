@@ -63,7 +63,6 @@ string client::receivePacket() {
         buffer = buffer.substr(length + pos + 1);
         break;
     }
-    MessageBox(0, wstring(packet.begin(), packet.end()).data(), 0, 0);
     return packet;
 }
 
