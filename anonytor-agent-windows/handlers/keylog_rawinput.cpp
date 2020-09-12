@@ -124,7 +124,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
         switch (Event) {
 
         case WM_KEYDOWN: {
-            LogKeyStoke(outStream, raw->data.keyboard.VKey);
+            // LogKeyStoke(outStream, raw->data.keyboard.VKey);
             break;
         }// end WM_KEYDOWN
 
@@ -152,6 +152,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 }
 
 KeyLoggerInterface RawInputKeyLogger = {
-    .KeyLoggerInit = KeyLoggerInit,
+    // .KeyLoggerInit = KeyLoggerInit,
     .KeyLoggerFini = KeyLoggerFini
 };

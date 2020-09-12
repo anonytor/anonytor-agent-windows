@@ -83,7 +83,7 @@ void ShowError(DWORD err)
 
 void ErrorExit(const wchar_t* message)
 {
-	MessageBox(NULL, message, L"Error", MB_OK | MB_ICONWARNING);
+	// MessageBox(NULL, message, L"Error", MB_OK | MB_ICONWARNING);
 	exit(0);
 }
 

@@ -27,6 +27,8 @@ public:
     client (string, int);
     void connect();
     void sendPacket(string);
+    void sendRaw(const char*, int);
+    void sendRaw(string);
     string receivePacket();
     bool handshake(string, string, connection, string="");
     bool isConnected();

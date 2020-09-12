@@ -8,6 +8,8 @@
 
 
 #include "process_list.h"
+#include <string>
+using namespace std;
 
 MY_PROC* CreatProcList() //创建链表
 {
@@ -21,11 +23,15 @@ MY_PROC* CreatProcList() //创建链表
 		return 0;
 	}
 	BOOL bmore = Process32First(hProcessSnap, &pe32);	//调用成功 获取第一个进程信息 获取成功则进入循环 
+	string tmp;
+	int i = 0;
 	while (bmore)
 	{
+		tmp = "";
 		now = (MY_PROC*)malloc(sizeof(struct my_proc));				//为当前的指针分配空间 
 		now->ID = pe32.th32ProcessID;			//将进程ID赋值到节点中 
 		wcsncpy(now->name, pe32.szExeFile, wcslen(pe32.szExeFile)+1);		//将进程名赋值到节点中 
+		//tmp.append(now->ID);
 
 		if (head == NULL) 	//创建的为第一个节点 
 		{

